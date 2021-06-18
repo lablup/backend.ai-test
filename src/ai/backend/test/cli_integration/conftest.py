@@ -6,7 +6,7 @@ import re
 
 import pytest
 
-_rx_env_export = re.compile(r"^export (\w+)=(.*)$")
+_rx_env_export = re.compile(r"^(export )?(?P<key>\w+)=(?P<val>.*)$")
 
 
 @pytest.fixture(scope="session")
@@ -35,5 +35,5 @@ def client_environ() -> dict[str, str]:
         lines = sample_admin_sh.read_text().splitlines()
         for line in lines:
             if m := _rx_env_export.search(line.strip()):
-                envs[m.group(1)] = m.group(2)
+                envs[m.group('key')] = m.group('val')
     return envs
