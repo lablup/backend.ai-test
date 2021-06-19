@@ -9,7 +9,7 @@ from ...utils.cli import EOF, ClientRunnerFunc
 _rs = functools.partial(re.search, flags=re.M)  # shortcut
 
 
-@pytest.mark.dependency()
+@pytest.mark.dependency(name="domain_crud")
 def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
     with closing(run([
         'admin', 'domains', 'add',
