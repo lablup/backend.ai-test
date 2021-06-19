@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import (
+    Protocol,
     Sequence,
 )
 
@@ -11,8 +13,19 @@ EOF = pexpect.EOF
 TIMEOUT = pexpect.TIMEOUT
 
 
+class ClientRunnerFunc(Protocol):
+
+    def __call__(
+        self,
+        cmdargs: Sequence[str | Path],
+        *args,
+        **kwargs,
+    ) -> pexpect.spawn:
+        pass
+
+
 def run(
-    args: Sequence[str],
+    args: Sequence[str | Path],
     *,
     default_timeout: int = 5,
     **kwargs,

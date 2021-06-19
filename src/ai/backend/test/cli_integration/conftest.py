@@ -3,8 +3,13 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import re
+import secrets
+from typing import Iterator, Sequence
 
+import pexpect
 import pytest
+
+from ai.backend.test.utils.cli import ClientRunnerFunc, run as _run
 
 _rx_env_export = re.compile(r"^(export )?(?P<key>\w+)=(?P<val>.*)$")
 
@@ -37,3 +42,29 @@ def client_environ() -> dict[str, str]:
             if m := _rx_env_export.search(line.strip()):
                 envs[m.group('key')] = m.group('val')
     return envs
+
+
+@pytest.fixture(scope="session")
+def run(client_bin: Path, client_environ: dict[str, str]) -> Iterator[ClientRunnerFunc]:
+
+    def run_impl(cmdargs: Sequence[str | Path], *args, **kwargs) -> pexpect.spawn:
+        return _run([client_bin, *cmdargs], *args, **kwargs, env=client_environ)
+
+    yield run_impl
+
+
+@pytest.fixture
+def domain_name() -> str:
+    return f"testing-{secrets.token_hex(8)}"
+
+
+@pytest.fixture
+def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
+    run(['admin', 'domains', 'add', domain_name])
+    try:
+        yield domain_name
+    finally:
+        p = run(['admin', 'domains', 'purge', domain_name])
+        p.expect_exact("Are you sure?")
+        p.sendline("Y")
+        p.close()
