@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from contextlib import closing
 import os
 from pathlib import Path
 import re
@@ -9,7 +10,7 @@ from typing import Iterator, Sequence
 import pexpect
 import pytest
 
-from ai.backend.test.utils.cli import ClientRunnerFunc, run as _run
+from ai.backend.test.utils.cli import ClientRunnerFunc, EOF, run as _run
 
 _rx_env_export = re.compile(r"^(export )?(?P<key>\w+)=(?P<val>.*)$")
 
@@ -61,10 +62,11 @@ def domain_name() -> str:
 @pytest.fixture
 def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
     run(['admin', 'domains', 'add', domain_name])
+    print("==== temp_domain created ====")
     try:
         yield domain_name
     finally:
-        p = run(['admin', 'domains', 'purge', domain_name])
-        p.expect_exact("Are you sure?")
-        p.sendline("Y")
-        p.close()
+        with closing(run(['admin', 'domains', 'purge', domain_name])) as p:
+            p.expect_exact("Are you sure?")
+            p.sendline("Y")
+            p.expect(EOF)

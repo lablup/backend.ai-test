@@ -18,6 +18,7 @@ def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
         domain_name,
     ])) as p:
         p.expect("is created")
+        p.expect(EOF)
 
     try:
         with closing(run([
@@ -32,7 +33,7 @@ def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
             'admin', 'domains',
         ])) as p:
             p.expect(EOF)
-            assert _rs(rb"^Name +Description +Active?", p.before)
+            assert _rs(rb"^Name +Description +Active\?", p.before)
             assert _rs(f"^{domain_name} +test domain +False".encode(), p.before)
 
         with closing(run([
@@ -44,23 +45,23 @@ def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
             '--allowed-docker-registries', 'cr.backend.ai',
             domain_name,
         ])) as p:
-            pass
+            p.expect("is updated")
+            p.expect(EOF)
 
         with closing(run([
-            'admin', 'domains',
+            'admin', 'domain', '-n', domain_name,
         ])) as p:
-            pass
+            p.expect(EOF)
+            assert _rs(rb"\blocal:volume1\b", p.before)
+            assert _rs(rb"\blocal:volume2\b", p.before)
+            assert _rs(rb"\bcr\.backend\.ai\b", p.before)
 
         with closing(run([
             'admin', 'domains', 'delete',
             domain_name,
         ])) as p:
-            pass
+            p.expect(EOF)
 
-        with closing(run([
-            'admin', 'domains',
-        ])) as p:
-            pass
     finally:
         with closing(run([
             'admin', 'domains', 'purge',
@@ -68,11 +69,12 @@ def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
         ])) as p:
             p.expect_exact("Are you sure?")
             p.sendline("Y")
+            p.expect(EOF)
 
         with closing(run([
             'admin', 'domains',
         ])) as p:
-            pass
+            p.expect(EOF)
 
 
 def test_user():
