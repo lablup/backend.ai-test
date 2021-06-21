@@ -1,6 +1,7 @@
 from contextlib import closing
 import functools
 import re
+import sys
 
 import pytest
 
@@ -51,7 +52,10 @@ def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
         with closing(run([
             'admin', 'domain', '-n', domain_name,
         ])) as p:
+            p.logfile = sys.stdout.buffer
             p.expect(EOF)
+            assert _rs(rb"^Active\? +True", p.before)
+            assert _rs(rb"Total Resource Slots +{\"cpu\": ?\"999\",", p.before)
             assert _rs(rb"\blocal:volume1\b", p.before)
             assert _rs(rb"\blocal:volume2\b", p.before)
             assert _rs(rb"\bcr\.backend\.ai\b", p.before)
@@ -60,6 +64,7 @@ def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
             'admin', 'domains', 'delete',
             domain_name,
         ])) as p:
+            p.expect("is inactivated")
             p.expect(EOF)
 
     finally:
