@@ -12,7 +12,8 @@ def test_add_user(run: ClientRunnerFunc):
     print("[ Add user ]")
 
     # Add user
-    add_arguments = ['--output=json', 'admin', 'user', 'add', '-u testaccount1', '-n "John Doe"', '--need-password-change', 'default', 'testaccount1@lablup.com', '1q2w3e4r']
+    add_arguments = ['--output=json', 'admin', 'user', 'add', '-u testaccount1', '-n "John Doe"', 
+                     '--need-password-change', 'default', 'testaccount1@lablup.com', '1q2w3e4r']
     with closing(run(add_arguments)) as p:
         p.expect(EOF)
 
