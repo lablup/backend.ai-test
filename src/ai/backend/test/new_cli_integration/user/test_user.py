@@ -10,7 +10,30 @@ from ...utils.cli import EOF, ClientRunnerFunc
 
 def test_add_user(run: ClientRunnerFunc):
     print("[ Add user ]")
-    pass
+
+    # Add user
+    add_arguments = ['--output=json', 'admin', 'user', 'add', '-u testaccount1', '-n "John Doe"', '--need-password-change', 'default', 'testaccount1@lablup.com', '1q2w3e4r']
+    with closing(run(add_arguments)) as p:
+        p.expect(EOF)
+
+    # Check if user is added
+    with closing(run(['--output=json', 'admin', 'user', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        user_list = loaded.get('items')
+        assert isinstance(user_list, list), 'Expected user list'
+        assert is_user_in_list(user_list, 'testaccount1'), 'Added account doesn\'t exist'
+
+        for user in user_list:
+            if user.get('username') == 'testaccount1':
+                added_user = user
+                break
+
+        assert added_user.get('email') == 'testaccount1@lablup.com', 'E-mail mismatch'
+        assert added_user.get('full_name') == 'John Doe', 'Full name mismatch'
+        assert added_user.get('status') == 'active', 'User status mismatch'
+        assert added_user.get('need_password_change') == True, 'Password change status mismatch'
 
 
 def test_update_user(run: ClientRunnerFunc):
@@ -21,3 +44,11 @@ def test_update_user(run: ClientRunnerFunc):
 def test_delete_user(run: ClientRunnerFunc):
     print("[ Delete user ]")
     pass
+
+
+def is_user_in_list(users: list, username: str) -> bool:
+    for user in users:
+        if user.get('username') == username:
+            return True
+    return False
+
