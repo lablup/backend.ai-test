@@ -52,21 +52,3 @@ def run(client_bin: Path, client_environ: dict[str, str]) -> Iterator[ClientRunn
         return _run([client_bin, *cmdargs], *args, **kwargs, env=client_environ)
 
     yield run_impl
-
-
-@pytest.fixture
-def domain_name() -> str:
-    return f"testing-{secrets.token_hex(8)}"
-
-
-@pytest.fixture
-def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
-    run(['admin', 'domains', 'add', domain_name])
-    print("==== temp_domain created ====")
-    try:
-        yield domain_name
-    finally:
-        with closing(run(['admin', 'domains', 'purge', domain_name])) as p:
-            p.expect_exact("Are you sure?")
-            p.sendline("Y")
-            p.expect(EOF)
