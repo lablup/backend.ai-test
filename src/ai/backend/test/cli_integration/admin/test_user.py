@@ -8,6 +8,7 @@ import pytest
 
 from ...utils.cli import EOF, ClientRunnerFunc
 
+
 def test_add_user(run: ClientRunnerFunc):
     """
     Testcase for user addition.
