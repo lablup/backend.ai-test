@@ -23,14 +23,10 @@ def test_add_user(run: ClientRunnerFunc):
         decoded = p.before.decode()
         loaded = json.loads(decoded)
         user_list = loaded.get('items')
+
         assert isinstance(user_list, list), 'Expected user list'
-        assert is_user_in_list(user_list, 'testaccount1'), 'Added account doesn\'t exist'
-
-        for user in user_list:
-            if user.get('username') == 'testaccount1':
-                added_user = user
-                break
-
+        added_user = get_user_from_json(user_list, 'testaccount1')
+        assert bool(added_user), 'Added account doesn\'t exist'
         assert added_user.get('email') == 'testaccount1@lablup.com', 'E-mail mismatch'
         assert added_user.get('full_name') == 'John Doe', 'Full name mismatch'
         assert added_user.get('status') == 'active', 'User status mismatch'
@@ -47,9 +43,9 @@ def test_delete_user(run: ClientRunnerFunc):
     pass
 
 
-def is_user_in_list(users: list, username: str) -> bool:
-    for user in users:
+def get_user_from_json(users: list, username: str) -> dict:
+    for user in user_list:
         if user.get('username') == username:
-            return True
-    return False
+            return user
 
+    return {}
