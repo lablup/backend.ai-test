@@ -44,7 +44,7 @@ def test_delete_user(run: ClientRunnerFunc):
 
 
 def get_user_from_json(users: list, username: str) -> dict:
-    for user in user_list:
+    for user in users:
         if user.get('username') == username:
             return user
 
