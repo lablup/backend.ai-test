@@ -140,8 +140,27 @@ def test_update_user(run: ClientRunnerFunc):
 
 
 def test_delete_user(run: ClientRunnerFunc):
+    """
+    !!Run this testcase after running test_add_user
+    Testcase for user deletion.
+    """
     print("[ Delete user ]")
-    pass
+    with closing(run(['admin', 'user', 'purge', 'testaccount1@lablup.com'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#1'
+
+    with closing(run(['admin', 'user', 'purge', 'testaccount2@lablup.com'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#2'
+
+    with closing(run(['admin', 'user', 'purge', 'testaccount3@lablup.com'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#3'
+
+
 
 
 def get_user_from_json(users: list, username: str) -> dict:
