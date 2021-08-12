@@ -161,6 +161,16 @@ def test_delete_user(run: ClientRunnerFunc):
         assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#3'
 
 
+def test_list_user(run: ClientRunnerFunc):
+    """
+    Testcase for user listing.
+    """
+    with closing(run(['--output=json', 'admin', 'user', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        user_list = loaded.get('items')
+        assert isinstance(user_list, list)
 
 
 def get_user_from_json(users: list, username: str) -> dict:
