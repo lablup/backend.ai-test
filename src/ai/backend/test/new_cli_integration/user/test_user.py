@@ -9,6 +9,9 @@ import pytest
 from ...utils.cli import EOF, ClientRunnerFunc
 
 def test_add_user(run: ClientRunnerFunc):
+    """
+    Testcase for user addition.
+    """
     print("[ Add user ]")
 
     # Check if test account exists
@@ -82,6 +85,11 @@ def test_add_user(run: ClientRunnerFunc):
 
 
 def test_update_user(run: ClientRunnerFunc):
+    """
+    Run this testcase after test_update_user.
+    Testcase for user update.
+    TODO: User update with roles is not fully covered yet.
+    """
     print("[ Update user ]")
 
     # Check if user exists
