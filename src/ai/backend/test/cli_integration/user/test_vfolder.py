@@ -5,7 +5,12 @@ from ...utils.cli import EOF, ClientRunnerFunc
 
 
 def test_create_vfolder(run: ClientRunnerFunc):
-    # Create group first TODO: Unannotate the following code after group deletion issue is resolved.
+    """
+    Test create vfolder function.
+    This test should be executed first in test_vfolder.py.
+    TODO: Unannotate the following code after group deletion issue is resolved.
+    """
+    # Create group first
     # with closing(run(['admin', 'group', 'add', 'default', 'testgroup'])) as p:
     #     p.expect(EOF)
     #     assert 'Group name testgroup is created in domain default' in p.before.decode(), \
@@ -39,6 +44,11 @@ def test_create_vfolder(run: ClientRunnerFunc):
 
 
 def test_rename_vfolder(run: ClientRunnerFunc):
+    """
+    Test rename vfolder function.
+    !! Make sure you execute this test after test_create_vfolder !!
+    Otherwise, it will raise an error.
+    """
     # Rename vfolder
     with closing(run(['vfolder', 'rename', 'testfolder1', 'testfolder3'])) as p:
         p.expect(EOF)
@@ -57,6 +67,11 @@ def test_rename_vfolder(run: ClientRunnerFunc):
 
 
 def test_delete_vfolder(run: ClientRunnerFunc):
+    """
+    Test delete vfolder function.
+    !! Make sure you execute this test after 1. test_create_vfolder, 2. test_rename_vfolder !!
+    Otherwise, it will raise an error.
+    """
     with closing(run(['vfolder', 'delete', 'testfolder2'])) as p:
         p.expect(EOF)
         assert 'Deleted' in p.before.decode(), 'Test folder 2 not deleted successfully.'
@@ -67,6 +82,9 @@ def test_delete_vfolder(run: ClientRunnerFunc):
 
 
 def test_list_vfolder(run: ClientRunnerFunc):
+    """
+    Test list vfolder function.
+    """
     with closing(run(['--output=json', 'vfolder', 'list'])) as p:
         p.expect(EOF)
         decoded = p.before.decode()
