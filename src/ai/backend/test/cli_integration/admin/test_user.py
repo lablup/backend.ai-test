@@ -17,9 +17,9 @@ def test_add_user(run: ClientRunnerFunc):
         loaded = json.loads(decoded)
         user_list = loaded.get('items')
 
-    test_user1 = get_user_from_json(user_list, 'testaccount1')
-    test_user2 = get_user_from_json(user_list, 'testaccount2')
-    test_user3 = get_user_from_json(user_list, 'testaccount3')
+    test_user1 = get_user_from_list(user_list, 'testaccount1')
+    test_user2 = get_user_from_list(user_list, 'testaccount2')
+    test_user3 = get_user_from_list(user_list, 'testaccount3')
 
     if not bool(test_user1):
         # Add user
@@ -54,9 +54,9 @@ def test_add_user(run: ClientRunnerFunc):
         user_list = loaded.get('items')
 
     assert isinstance(user_list, list), 'Expected user list'
-    added_user1 = get_user_from_json(user_list, 'testaccount1')
-    added_user2 = get_user_from_json(user_list, 'testaccount2')
-    added_user3 = get_user_from_json(user_list, 'testaccount3')
+    added_user1 = get_user_from_list(user_list, 'testaccount1')
+    added_user2 = get_user_from_list(user_list, 'testaccount2')
+    added_user3 = get_user_from_list(user_list, 'testaccount3')
 
     assert bool(added_user1), 'Added account doesn\'t exist: Account#1'
     assert added_user1.get('email') == 'testaccount1@lablup.com', 'E-mail mismatch: Account#1'
@@ -120,9 +120,9 @@ def test_update_user(run: ClientRunnerFunc):
         updated_user_list = after_update_loaded.get('items')
         assert isinstance(updated_user_list, list), 'Expected user list'
 
-    test_user1 = get_user_from_json(updated_user_list, 'testaccount123')
-    test_user2 = get_user_from_json(updated_user_list, 'testaccount231')
-    test_user3 = get_user_from_json(updated_user_list, 'testaccount312')
+    test_user1 = get_user_from_list(updated_user_list, 'testaccount123')
+    test_user2 = get_user_from_list(updated_user_list, 'testaccount231')
+    test_user3 = get_user_from_list(updated_user_list, 'testaccount312')
 
     assert bool(test_user1), 'Account not found - Account#1'
     assert test_user1.get('full_name') == 'Foo Bar', 'Full name mismatch: Account#1'
@@ -177,7 +177,7 @@ def test_list_user(run: ClientRunnerFunc):
         assert isinstance(user_list, list)
 
 
-def get_user_from_json(users: list, username: str) -> dict:
+def get_user_from_list(users: list, username: str) -> dict:
     for user in users:
         if user.get('username') == username:
             return user
