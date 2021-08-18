@@ -15,7 +15,7 @@ def test_create_vfolder(run: ClientRunnerFunc):
     #     p.expect(EOF)
     #     assert 'Group name testgroup is created in domain default' in p.before.decode(), \
     #         'Test group not created successfully.'
-
+    print("[ Create vfolder ]")
     # Create vfolder
     with closing(run(['vfolder', 'create',  '-p', 'rw', 'testfolder1', 'local:volume1'])) as p:
         p.expect(EOF)
@@ -49,6 +49,7 @@ def test_rename_vfolder(run: ClientRunnerFunc):
     !! Make sure you execute this test after test_create_vfolder !!
     Otherwise, it will raise an error.
     """
+    print("[ Rename vfolder ]")
     # Rename vfolder
     with closing(run(['vfolder', 'rename', 'testfolder1', 'testfolder3'])) as p:
         p.expect(EOF)
@@ -72,6 +73,7 @@ def test_delete_vfolder(run: ClientRunnerFunc):
     !! Make sure you execute this test after 1. test_create_vfolder, 2. test_rename_vfolder !!
     Otherwise, it will raise an error.
     """
+    print("[ Delete vfolder ]")
     with closing(run(['vfolder', 'delete', 'testfolder2'])) as p:
         p.expect(EOF)
         assert 'Deleted' in p.before.decode(), 'Test folder 2 not deleted successfully.'
