@@ -39,7 +39,21 @@ def test_create_vfolder(run: ClientRunnerFunc):
 
 
 def test_rename_vfolder(run: ClientRunnerFunc):
-    pass
+    # Rename vfolder
+    with closing(run(['vfolder', 'rename', 'testfolder1', 'testfolder3'])) as p:
+        p.expect(EOF)
+        assert 'Renamed' in p.before.decode(), 'Test folder1 not renamed successfully.'
+
+    # Check if vfolder is updated
+    with closing(run(['--output=json', 'vfolder', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        folder_list = loaded.get('items')
+        assert isinstance(folder_list, list), 'Error in listing test folders!'
+
+    testfolder3 = get_folder_from_list(folder_list, 'testfolder3')
+    assert bool(testfolder3), 'Test folder 3 doesn\'t exist!'
 
 
 def test_delete_vfolder(run: ClientRunnerFunc):
