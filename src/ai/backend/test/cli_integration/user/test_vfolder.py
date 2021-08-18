@@ -57,7 +57,13 @@ def test_rename_vfolder(run: ClientRunnerFunc):
 
 
 def test_delete_vfolder(run: ClientRunnerFunc):
-    pass
+    with closing(run(['vfolder', 'delete', 'testfolder2'])) as p:
+        p.expect(EOF)
+        assert 'Deleted' in p.before.decode(), 'Test folder 2 not deleted successfully.'
+
+    with closing(run(['vfolder', 'delete', 'testfolder3'])) as p:
+        p.expect(EOF)
+        assert 'Deleted' in p.before.decode(), 'Test folder 3 not deleted successfully.'
 
 
 def test_list_vfolder(run: ClientRunnerFunc):
