@@ -57,7 +57,41 @@ def test_update_keypair(run: ClientRunnerFunc):
 
 
 def test_delete_keypair(run: ClientRunnerFunc):
-    pass
+    print("[ Delete keypair ]")
+    # Get access key
+    with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        keypair_list = loaded.get('items')
+        assert isinstance(keypair_list, list), 'List not printed properly!'
+
+    adminkeypair = get_keypair_from_list(keypair_list, 'adminkeypair@lablup.com')
+    userkeypair = get_keypair_from_list(keypair_list, 'userkeypair@lablup.com')
+
+    assert bool(adminkeypair), 'Admin keypair info doesn\'t exist'
+    assert bool(userkeypair), 'User keypair info doesn\'t exist'
+
+    # Delete keypair
+    with closing(run(['admin', 'keypair', 'delete', adminkeypair.get('access_key')])) as p:
+        p.expect(EOF)
+        print(p.before.decode())
+
+    with closing(run(['admin', 'keypair', 'delete', userkeypair.get('access_key')])) as p:
+        p.expect(EOF)
+        print(p.before.decode())
+
+    # Delete test user
+    with closing(run(['admin', 'user', 'purge', 'adminkeypair@lablup.com'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: adminkeypair'
+
+    with closing(run(['admin', 'user', 'purge', 'userkeypair@lablup.com'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: userkeypair'
+
 
 
 def test_list_keypair(run: ClientRunnerFunc):
