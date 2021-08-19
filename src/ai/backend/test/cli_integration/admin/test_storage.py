@@ -5,6 +5,9 @@ from ...utils.cli import EOF, ClientRunnerFunc
 
 
 def test_list_storage(run: ClientRunnerFunc):
+    """
+    Test list storage.
+    """
     print("[ List storage ]")
     with closing(run(['--output=json', 'admin', 'storage', 'list'])) as p:
         p.expect(EOF)
@@ -15,6 +18,9 @@ def test_list_storage(run: ClientRunnerFunc):
 
 
 def test_info_storage(run: ClientRunnerFunc):
+    """
+    Test storage info.
+    """
     print("[ Print storage info ]")
     with closing(run(['--output=json', 'admin', 'storage', 'info', 'local:volume1'])) as p:
         p.expect(EOF)
