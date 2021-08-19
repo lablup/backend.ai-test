@@ -53,7 +53,54 @@ def test_add_keypair(run: ClientRunnerFunc):
 
 
 def test_update_keypair(run: ClientRunnerFunc):
-    pass
+    print("[ Update keypair ]")
+    # Get access key
+    with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        keypair_list = loaded.get('items')
+        assert isinstance(keypair_list, list), 'List not printed properly!'
+
+    adminkeypair = get_keypair_from_list(keypair_list, 'adminkeypair@lablup.com')
+    userkeypair = get_keypair_from_list(keypair_list, 'userkeypair@lablup.com')
+
+    assert bool(adminkeypair), 'Admin keypair info doesn\'t exist'
+    assert bool(userkeypair), 'User keypair info doesn\'t exist'
+
+    # Update keypair
+    with closing(run(['admin', 'keypair', 'update', '--is-active', 'TRUE', '--is-admin', 'FALSE',
+                      '-r', '15000', adminkeypair.get('access_key')])) as p:
+        p.expect(EOF)
+        assert 'Key pair is updated:' in p.before.decode(), 'Admin keypair update error'
+
+    with closing(run(['admin', 'keypair', 'update', '--is-active', 'FALSE', '--is-admin', 'TRUE',
+                      '-r', '15000', userkeypair.get('access_key')])) as p:
+        p.expect(EOF)
+        assert 'Key pair is updated:' in p.before.decode(), 'User keypair update error'
+
+    # Check if keypair is updated
+    with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        updated_keypair_list = loaded.get('items')
+        assert isinstance(updated_keypair_list, list), 'List not printed properly!'
+
+    updated_adminkeypair = get_keypair_from_list(updated_keypair_list, 'adminkeypair@lablup.com')
+    updated_userkeypair = get_keypair_from_list(updated_keypair_list, 'userkeypair@lablup.com')
+
+    assert bool(updated_adminkeypair), 'Admin keypair doesn\'t exist'
+    assert updated_adminkeypair.get('is_active') == True, 'Admin keypair is_active mismatch'
+    assert updated_adminkeypair.get('is_admin') == False, 'Admin keypair is_admin mismatch'
+    assert updated_adminkeypair.get('rate_limit') == 15000, 'Admin keypair rate_limit mismatch'
+    assert updated_adminkeypair.get('resource_policy') == 'default', 'Admin keypair resource_policy mismatch'
+
+    assert bool(updated_userkeypair), 'Admin keypair doesn\'t exist'
+    assert updated_userkeypair.get('is_active') == False, 'User keypair is_active mismatch'
+    assert updated_userkeypair.get('is_admin') == True, 'User keypair is_admin mismatch'
+    assert updated_userkeypair.get('rate_limit') == 15000, 'User keypair rate_limit mismatch'
+    assert updated_userkeypair.get('resource_policy') == 'default', 'User keypair resource_policy mismatch'
 
 
 def test_delete_keypair(run: ClientRunnerFunc):
