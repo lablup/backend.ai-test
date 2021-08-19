@@ -100,4 +100,12 @@ def test_list_keypair(run: ClientRunnerFunc):
         decoded = p.before.decode()
         loaded = json.loads(decoded)
         keypair_list = loaded.get('items')
-        assert isinstance(keypair_list, list)
+        assert isinstance(keypair_list, list), 'List not printed properly!'
+
+
+def get_keypair_from_list(keypairs: list, userid: str) -> dict:
+    for keypair in keypairs:
+        if keypair.get('user_id', '') == userid:
+            return keypair
+
+    return {}
