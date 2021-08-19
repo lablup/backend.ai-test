@@ -152,7 +152,6 @@ def test_delete_keypair(run: ClientRunnerFunc):
         assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: userkeypair'
 
 
-
 def test_list_keypair(run: ClientRunnerFunc):
     """
     Test list keypair.
