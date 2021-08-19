@@ -34,7 +34,9 @@ def test_update_scaling_group(run: ClientRunnerFunc):
 
 
 def test_delete_scaling_group(run: ClientRunnerFunc):
-    pass
+    with closing(run(['admin', 'scaling-group', 'delete', 'testgroup1'])) as p:
+        p.expect(EOF)
+        assert 'Scaling group is deleted: testgroup1.' in p.before.decode(), 'Test scaling group deletion unsuccessful'
 
 
 def test_list_scaling_group(run: ClientRunnerFunc):
