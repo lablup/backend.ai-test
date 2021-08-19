@@ -17,4 +17,9 @@ def test_delete_keypair(run: ClientRunnerFunc):
 
 
 def test_list_keypair(run: ClientRunnerFunc):
-    pass
+    with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        keypair_list = loaded.get('items')
+        assert isinstance(keypair_list, list)
