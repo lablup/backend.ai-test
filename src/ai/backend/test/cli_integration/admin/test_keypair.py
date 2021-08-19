@@ -5,6 +5,10 @@ from ...utils.cli import EOF, ClientRunnerFunc
 
 
 def test_add_keypair(run: ClientRunnerFunc):
+    """
+    Test add keypair.
+    This test should be execued first in test_keypair.py.
+    """
     print("[ Add keypair ]")
     # Add test user
     add_arguments = ['--output=json', 'admin', 'user', 'add', '-u', 'adminkeypair', '-n', 'John Doe',
@@ -53,6 +57,10 @@ def test_add_keypair(run: ClientRunnerFunc):
 
 
 def test_update_keypair(run: ClientRunnerFunc):
+    """
+    Test update keypair.
+    This test must be executed after test_add_keypair.
+    """
     print("[ Update keypair ]")
     # Get access key
     with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
@@ -104,6 +112,10 @@ def test_update_keypair(run: ClientRunnerFunc):
 
 
 def test_delete_keypair(run: ClientRunnerFunc):
+    """
+    Test delete keypair.
+    This test must be executed after test_add_keypair.
+    """
     print("[ Delete keypair ]")
     # Get access key
     with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
@@ -142,6 +154,9 @@ def test_delete_keypair(run: ClientRunnerFunc):
 
 
 def test_list_keypair(run: ClientRunnerFunc):
+    """
+    Test list keypair.
+    """
     with closing(run(['--output=json', 'admin', 'keypair', 'list'])) as p:
         p.expect(EOF)
         decoded = p.before.decode()
