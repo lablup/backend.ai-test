@@ -17,4 +17,9 @@ def test_delete_scaling_group(run: ClientRunnerFunc):
 
 
 def test_list_scaling_group(run: ClientRunnerFunc):
-    pass
+    with closing(run(['--output=json', 'admin', 'scaling-group', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        scaling_group_list = loaded.get('items')
+        assert isinstance(scaling_group_list, list), 'Scaling group list not printed properly'
