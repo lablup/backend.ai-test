@@ -73,4 +73,10 @@ def test_delete_domain(run: ClientRunnerFunc):
 
 
 def test_list_domain(run: ClientRunnerFunc):
-    pass
+    with closing(run(['--output=json', 'admin', 'domain', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        domain_list = loaded.get('items')
+        assert isinstance(domain_list, list), 'Domain list not printed properly'
+
