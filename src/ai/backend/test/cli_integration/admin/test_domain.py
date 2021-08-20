@@ -1,9 +1,5 @@
+import json
 from contextlib import closing
-import functools
-import re
-import sys
-
-import pytest
 
 from ...utils.cli import EOF, ClientRunnerFunc
 
