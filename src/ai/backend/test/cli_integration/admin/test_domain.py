@@ -63,7 +63,13 @@ def test_update_domain(run: ClientRunnerFunc):
 
 
 def test_delete_domain(run: ClientRunnerFunc):
-    pass
+    print("[ Delete domain ]")
+
+    # Delete domain
+    with closing(run(['admin', 'domain', 'purge', 'test123'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'Domain is deleted:' in p.before.decode(), 'Domain deletion failed'
 
 
 def test_list_domain(run: ClientRunnerFunc):
