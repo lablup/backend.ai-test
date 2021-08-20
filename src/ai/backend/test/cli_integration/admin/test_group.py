@@ -1,16 +1,20 @@
-import functools
-import re
+import json
+from contextlib import closing
 
-import pytest
-
-from ...utils.cli import ClientRunnerFunc
-
-_rs = functools.partial(re.search, flags=re.M)  # shortcut
+from ...utils.cli import EOF, ClientRunnerFunc
 
 
-@pytest.mark.dependency(
-    depends=["domain_crud"],
-    scope="package",
-)
-def test_group(temp_domain: str, run: ClientRunnerFunc) -> None:
+def test_add_group(run: ClientRunnerFunc):
+    pass
+
+
+def test_update_group(run: ClientRunnerFunc):
+    pass
+
+
+def test_delete_group(run: ClientRunnerFunc):
+    pass
+
+
+def test_list_group(run: ClientRunnerFunc):
     pass
