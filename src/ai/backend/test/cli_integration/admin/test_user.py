@@ -98,7 +98,7 @@ def test_update_user(run: ClientRunnerFunc):
 
     # Update user
     update_arguments = ['--output=json', 'admin', 'user', 'update', '-u', 'testaccount123', '-n', 'Foo Bar', '-s',
-                        'inactive', 'testaccount1@lablup.com']
+                        'inactive', '-d', 'default', 'testaccount1@lablup.com']
     with closing(run(update_arguments)) as p:
         p.expect(EOF)
 
@@ -129,6 +129,7 @@ def test_update_user(run: ClientRunnerFunc):
     assert test_user1.get('status') == 'inactive', 'User status mismatch: Account#1'
     assert test_user1.get('role') == 'user', 'Role mismatch: Account#1'
     assert test_user1.get('need_password_change') == False, 'Password change status mismatch: Account#1'
+    assert test_user1.get('domain_name') == 'default', 'Domain mismatch: Account#1'
 
     assert bool(test_user2), 'Account not found - Account#2'
     assert test_user2.get('full_name') == 'Baz Quz', 'Full name mismatch: Account#2'
