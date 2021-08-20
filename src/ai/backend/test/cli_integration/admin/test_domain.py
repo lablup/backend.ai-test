@@ -80,3 +80,10 @@ def test_list_domain(run: ClientRunnerFunc):
         domain_list = loaded.get('items')
         assert isinstance(domain_list, list), 'Domain list not printed properly'
 
+
+def get_domain_from_list(domains: list, name: str) -> dict:
+    for domain in domains:
+        if domain.get('name') == name:
+            return domain
+
+    return {}
