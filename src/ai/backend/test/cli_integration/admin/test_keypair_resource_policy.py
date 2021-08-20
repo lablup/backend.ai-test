@@ -74,7 +74,13 @@ def test_update_keypair_resource_policy(run: ClientRunnerFunc):
 
 
 def test_delete_keypair_resource_policy(run: ClientRunnerFunc):
-    pass
+    print("[ Delete keypair resource policy ]")
+
+    # Delete keypair resource policy
+    with closing(run(['admin', 'keypair-resource-policy', 'delete', 'test_krp'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'Resource policy test_krp is deleted.' in p.before.decode(), 'Keypair resource policy deletion failed'
 
 
 def test_list_keypair_resource_policy(run: ClientRunnerFunc):
