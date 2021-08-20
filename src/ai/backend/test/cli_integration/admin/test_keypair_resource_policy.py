@@ -15,7 +15,7 @@ def test_add_keypair_resource_policy(run: ClientRunnerFunc):
     with closing(run(add_arguments)) as p:
         p.expect(EOF)
         assert 'Keypair resource policy test_krp is created.' in p.before.decode(), \
-            'Keypaire resourde policy creation not successful'
+            'Keypair resource policy creation not successful'
 
     # Check if keypair resource policy is created
     with closing(run(['--output=json', 'admin', 'keypair-resource-policy', 'list'])) as p:
