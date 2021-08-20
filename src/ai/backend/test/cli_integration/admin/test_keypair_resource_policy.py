@@ -17,4 +17,11 @@ def test_delete_keypair_resource_policy(run: ClientRunnerFunc):
 
 
 def test_list_keypair_resource_policy(run: ClientRunnerFunc):
-    pass
+    print("[ List keypair resource policy ]")
+    with closing(run(['--output=json', 'admin', 'keypair-resource-policy', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        krp_list = loaded.get('items')
+        assert isinstance(krp_list, list), 'Keypair resource policy list not printed properly'
+
