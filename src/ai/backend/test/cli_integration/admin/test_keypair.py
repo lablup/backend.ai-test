@@ -73,7 +73,7 @@ def test_update_keypair(run: ClientRunnerFunc):
     admin_keypair = get_keypair_from_list(keypair_list, 'adminkeypair@lablup.com')
     user_keypair = get_keypair_from_list(keypair_list, 'userkeypair@lablup.com')
     assert 'access_key' in admin_keypair, 'Admin keypair info doesn\'t exist'
-    assert 'accesS_key' in user_keypair, 'User keypair info doesn\'t exist'
+    assert 'access_key' in user_keypair, 'User keypair info doesn\'t exist'
 
     # Update keypair
     with closing(run([

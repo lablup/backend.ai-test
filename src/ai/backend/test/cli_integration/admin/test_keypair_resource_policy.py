@@ -8,10 +8,18 @@ def test_add_keypair_resource_policy(run: ClientRunnerFunc):
     print("[ Add keypair resource policy ]")
 
     # Add keypair resource policy
-    add_arguments = ['admin', 'keypair-resource-policy', 'add', '--default-for-unspecified', 'LIMITED',
-                     '--total-resource-slots', '{}', '--max-concurrent-sessions', '20', '--max-containers-per-session',
-                     '2', '--max-vfolder-count', '15', '--max-vfolder-size', '0', '--allowed-vfolder-hosts',
-                     'local:volume1', '--idle-timeout', '1200', 'test_krp']
+    add_arguments = [
+        'admin', 'keypair-resource-policy', 'add',
+        '--default-for-unspecified', 'LIMITED',
+        '--total-resource-slots', '{}',
+        '--max-concurrent-sessions', '20',
+        '--max-containers-per-session', '2',
+        '--max-vfolder-count', '15',
+        '--max-vfolder-size', '0',
+        '--allowed-vfolder-hosts', 'local:volume1',
+        '--idle-timeout', '1200',
+        'test_krp',
+    ]
     with closing(run(add_arguments)) as p:
         p.expect(EOF)
         assert 'Keypair resource policy test_krp is created.' in p.before.decode(), \
@@ -31,7 +39,7 @@ def test_add_keypair_resource_policy(run: ClientRunnerFunc):
     assert test_krp.get('total_resource_slots') == '{}', 'Test keypair resource policy total resource slot mismatch'
     assert test_krp.get('max_concurrent_sessions') == 20, 'Test keypair resource policy max concurrent session mismatch'
     assert test_krp.get('max_vfolder_count') == 15, 'Test keypair resource policy max vfolder count mismatch'
-    assert test_krp.get('max_vfolder_size') == 0, 'Test keypair resource policy max vfolder size mismatch'
+    assert test_krp.get('max_vfolder_size') == '0 Bytes', 'Test keypair resource policy max vfolder size mismatch'
     assert test_krp.get('idle_timeout') == 1200, 'Test keypair resource policy idle timeout mismatch'
     assert test_krp.get('max_containers_per_session') == 2,\
         'Test keypair resouce policy max containers per session mismatch'
@@ -43,10 +51,18 @@ def test_update_keypair_resource_policy(run: ClientRunnerFunc):
     print("[ Update keypair resource policy ]")
 
     # Update keypair resource policy
-    add_arguments = ['admin', 'keypair-resource-policy', 'update', '--default-for-unspecified', 'UNLIMITED',
-                     '--total-resource-slots', '{}', '--max-concurrent-sessions', '30', '--max-containers-per-session',
-                     '1', '--max-vfolder-count', '10', '--max-vfolder-size', '0', '--allowed-vfolder-hosts',
-                     'local:volume2', '--idle-timeout', '1800', 'test_krp']
+    add_arguments = [
+        'admin', 'keypair-resource-policy', 'update',
+        '--default-for-unspecified', 'UNLIMITED',
+        '--total-resource-slots', '{}',
+        '--max-concurrent-sessions', '30',
+        '--max-containers-per-session', '1',
+        '--max-vfolder-count', '10',
+        '--max-vfolder-size', '0',
+        '--allowed-vfolder-hosts', 'local:volume2',
+        '--idle-timeout', '1800',
+        'test_krp',
+    ]
     with closing(run(add_arguments)) as p:
         p.expect(EOF)
         assert 'Update succeeded.' in p.before.decode(), 'Keypair resource policy update not successful'
@@ -65,7 +81,7 @@ def test_update_keypair_resource_policy(run: ClientRunnerFunc):
     assert test_krp.get('total_resource_slots') == '{}', 'Test keypair resource policy total resource slot mismatch'
     assert test_krp.get('max_concurrent_sessions') == 30, 'Test keypair resource policy max concurrent session mismatch'
     assert test_krp.get('max_vfolder_count') == 10, 'Test keypair resource policy max vfolder count mismatch'
-    assert test_krp.get('max_vfolder_size') == 0, 'Test keypair resource policy max vfolder size mismatch'
+    assert test_krp.get('max_vfolder_size') == '0 Bytes', 'Test keypair resource policy max vfolder size mismatch'
     assert test_krp.get('idle_timeout') == 1800, 'Test keypair resource policy idle timeout mismatch'
     assert test_krp.get('max_containers_per_session') == 1,\
         'Test keypair resouce policy max containers per session mismatch'
