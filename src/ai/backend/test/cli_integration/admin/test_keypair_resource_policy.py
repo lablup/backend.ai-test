@@ -97,5 +97,4 @@ def get_keypair_resource_policy_from_list(krps: list, name: str) -> dict:
     for krp in krps:
         if krp.get('name') == name:
             return krp
-
     return {}

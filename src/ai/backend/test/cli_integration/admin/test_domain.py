@@ -26,7 +26,7 @@ def test_add_domain(run: ClientRunnerFunc):
 
     assert bool(test_domain), 'Test domain doesn\'t exist'
     assert test_domain.get('description') == 'Test domain', 'Domain description mismatch'
-    assert test_domain.get('is_active') == False, 'Domain active status mismatch'
+    assert test_domain.get('is_active') is False, 'Domain active status mismatch'
     assert test_domain.get('total_resource_slots') == '{}', 'Domain total resource slots mismatch'
     assert test_domain.get('allowed_vfolder_hosts') == ['local:volume1'], 'Domain allowed vfolder hosts mismatch'
     assert test_domain.get('allowed_docker_registries') == ['cr.backend.ai'], 'Domain allowed docker registries mismatch'
@@ -55,7 +55,7 @@ def test_update_domain(run: ClientRunnerFunc):
 
     assert bool(test_domain), 'Test domain doesn\'t exist'
     assert test_domain.get('description') == 'Test domain updated', 'Domain description mismatch'
-    assert test_domain.get('is_active') == True, 'Domain active status mismatch'
+    assert test_domain.get('is_active') is True, 'Domain active status mismatch'
     assert test_domain.get('total_resource_slots') == '{}', 'Domain total resource slots mismatch'
     assert test_domain.get('allowed_vfolder_hosts') == ['local:volume2'], 'Domain allowed vfolder hosts mismatch'
     assert test_domain.get('allowed_docker_registries') == ['cr1.backend.ai'], \
@@ -85,5 +85,4 @@ def get_domain_from_list(domains: list, name: str) -> dict:
     for domain in domains:
         if domain.get('name') == name:
             return domain
-
     return {}
