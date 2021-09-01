@@ -1,107 +1,102 @@
+import json
 from contextlib import closing
-import functools
-import re
-import sys
-
-import pytest
 
 from ...utils.cli import EOF, ClientRunnerFunc
 
-_rs = functools.partial(re.search, flags=re.M)  # shortcut
 
+def test_add_domain(run: ClientRunnerFunc):
+    print("[ Add domain ]")
 
-@pytest.mark.dependency(name="domain_crud")
-def test_domain(domain_name: str, run: ClientRunnerFunc) -> None:
-    with closing(run([
-        'admin', 'domains', 'add',
+    # Add domain
+    add_arguments = [
+        'admin', 'domain', 'add',
+        '-d', 'Test domain',
         '-i',
-        '-d', 'test domain',
-        domain_name,
-    ])) as p:
-        p.expect("is created")
+        '--total-resource-slots', '{}',
+        '--allowed-vfolder-hosts', 'local:volume1',
+        '--allowed-docker-registries', 'cr.backend.ai',
+        'test',
+    ]
+    with closing(run(add_arguments)) as p:
         p.expect(EOF)
+        assert 'Domain name test is created.' in p.before.decode(), 'Domain creation not successful'
 
-    try:
-        with closing(run([
-            'admin', 'domain', '-n', domain_name,
-        ])) as p:
-            p.expect(EOF)
-            assert _rs(f"^Name +{domain_name}".encode(), p.before)
-            assert _rs(rb"^Description +test domain", p.before)
-            assert _rs(rb"^Active\? +False", p.before)
+    # Check if domain is added
+    with closing(run(['--output=json', 'admin', 'domain', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        domain_list = loaded.get('items')
+        assert isinstance(domain_list, list), 'Domain list not printed properly'
 
-        with closing(run([
-            'admin', 'domains',
-        ])) as p:
-            p.expect(EOF)
-            assert _rs(rb"^Name +Description +Active\?", p.before)
-            assert _rs(f"^{domain_name} +test domain +False".encode(), p.before)
+    test_domain = get_domain_from_list(domain_list, 'test')
 
-        with closing(run([
-            'admin', 'domains', 'update',
-            '--is-active', 'true',
-            '--total-resource-slots', '{"cpu":999,"mem":"999g"}',
-            '--allowed-vfolder-hosts', 'local:volume1',
-            '--allowed-vfolder-hosts', 'local:volume2',
-            '--allowed-docker-registries', 'cr.backend.ai',
-            domain_name,
-        ])) as p:
-            p.expect("is updated")
-            p.expect(EOF)
-
-        with closing(run([
-            'admin', 'domain', '-n', domain_name,
-        ])) as p:
-            p.logfile = sys.stdout.buffer
-            p.expect(EOF)
-            assert _rs(rb"^Active\? +True", p.before)
-            assert _rs(rb"Total Resource Slots +{\"cpu\": ?\"999\",", p.before)
-            assert _rs(rb"\blocal:volume1\b", p.before)
-            assert _rs(rb"\blocal:volume2\b", p.before)
-            assert _rs(rb"\bcr\.backend\.ai\b", p.before)
-
-        with closing(run([
-            'admin', 'domains', 'delete',
-            domain_name,
-        ])) as p:
-            p.expect("is inactivated")
-            p.expect(EOF)
-
-    finally:
-        with closing(run([
-            'admin', 'domains', 'purge',
-            domain_name,
-        ])) as p:
-            p.expect_exact("Are you sure?")
-            p.sendline("Y")
-            p.expect(EOF)
-
-        with closing(run([
-            'admin', 'domains',
-        ])) as p:
-            p.expect(EOF)
+    assert bool(test_domain), 'Test domain doesn\'t exist'
+    assert test_domain.get('description') == 'Test domain', 'Domain description mismatch'
+    assert test_domain.get('is_active') is False, 'Domain active status mismatch'
+    assert test_domain.get('total_resource_slots') == {}, 'Domain total resource slots mismatch'
+    assert test_domain.get('allowed_vfolder_hosts') == ['local:volume1'], 'Domain allowed vfolder hosts mismatch'
+    assert test_domain.get('allowed_docker_registries') == ['cr.backend.ai'], 'Domain allowed docker registries mismatch'
 
 
-def test_user():
-    print("[ User ]")
-    pass
+def test_update_domain(run: ClientRunnerFunc):
+    print("[ Update domain ]")
+
+    # Update domain
+    add_arguments = [
+        'admin', 'domain', 'update',
+        '--new-name', 'test123',
+        '--description', 'Test domain updated',
+        '--is-active', 'TRUE',
+        '--total-resource-slots', '{}',
+        '--allowed-vfolder-hosts', 'local:volume2',
+        '--allowed-docker-registries', 'cr1.backend.ai',
+        'test',
+    ]
+    with closing(run(add_arguments)) as p:
+        p.expect(EOF)
+        assert 'Domain test is updated.' in p.before.decode(), 'Domain update not successful'
+
+    # Check if domain is updated
+    with closing(run(['--output=json', 'admin', 'domain', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        domain_list = loaded.get('items')
+        assert isinstance(domain_list, list), 'Domain list not printed properly'
+
+    test_domain = get_domain_from_list(domain_list, 'test123')
+
+    assert bool(test_domain), 'Test domain doesn\'t exist'
+    assert test_domain.get('description') == 'Test domain updated', 'Domain description mismatch'
+    assert test_domain.get('is_active') is True, 'Domain active status mismatch'
+    assert test_domain.get('total_resource_slots') == {}, 'Domain total resource slots mismatch'
+    assert test_domain.get('allowed_vfolder_hosts') == ['local:volume2'], 'Domain allowed vfolder hosts mismatch'
+    assert test_domain.get('allowed_docker_registries') == ['cr1.backend.ai'], \
+        'Domain allowed docker registries mismatch'
 
 
-def test_keypair():
-    print("[ KeyPair ]")
-    pass
+def test_delete_domain(run: ClientRunnerFunc):
+    print("[ Delete domain ]")
+
+    # Delete domain
+    with closing(run(['admin', 'domain', 'purge', 'test123'])) as p:
+        p.sendline('y')
+        p.expect(EOF)
+        assert 'Domain is deleted:' in p.before.decode(), 'Domain deletion failed'
 
 
-def test_scaling_group():
-    print("[ ScalingGroup ]")
-    pass
+def test_list_domain(run: ClientRunnerFunc):
+    with closing(run(['--output=json', 'admin', 'domain', 'list'])) as p:
+        p.expect(EOF)
+        decoded = p.before.decode()
+        loaded = json.loads(decoded)
+        domain_list = loaded.get('items')
+        assert isinstance(domain_list, list), 'Domain list not printed properly'
 
 
-def test_resource_policy():
-    print("[ ResourcePolicy ]")
-    pass
-
-
-def test_resource_preset():
-    print("[ ResourcePreset ]")
-    pass
+def get_domain_from_list(domains: list, name: str) -> dict:
+    for domain in domains:
+        if domain.get('name') == name:
+            return domain
+    return {}
