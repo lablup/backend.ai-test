@@ -61,12 +61,13 @@ def domain_name() -> str:
 
 @pytest.fixture
 def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
-    run(['admin', 'domains', 'add', domain_name])
+    with closing(run(['admin', 'domain', 'add', domain_name])) as p:
+        p.expect(EOF)
+
     print("==== temp_domain created ====")
     try:
         yield domain_name
     finally:
-        with closing(run(['admin', 'domains', 'purge', domain_name])) as p:
-            p.expect_exact("Are you sure?")
+        with closing(run(['admin', 'domain', 'purge', domain_name])) as p:
             p.sendline("Y")
             p.expect(EOF)

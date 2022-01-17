@@ -16,8 +16,8 @@ def test_add_scaling_group(run: ClientRunnerFunc):
         'test_group1',
     ])) as p:
         p.expect(EOF)
-        assert 'Scaling group name test_group1 is created.' in p.before.decode(), \
-            'Test scaling group not created successfully'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'Scaling group creation has failed'
 
     # Check if scaling group is created
     with closing(run(['--output=json', 'admin', 'scaling-group', 'list'])) as p:
@@ -57,8 +57,8 @@ def test_update_scaling_group(run: ClientRunnerFunc):
         'test_group1',
     ])) as p:
         p.expect(EOF)
-        assert 'Scaling group test_group1 is updated.' in p.before.decode(), \
-            'Test scaling group not updated successfully'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'Scaling group update has failed'
 
     # Check if scaling group is updated
     with closing(run(['--output=json', 'admin', 'scaling-group', 'info', 'test_group1'])) as p:
@@ -82,7 +82,8 @@ def test_update_scaling_group(run: ClientRunnerFunc):
 def test_delete_scaling_group(run: ClientRunnerFunc):
     with closing(run(['admin', 'scaling-group', 'delete', 'test_group1'])) as p:
         p.expect(EOF)
-        assert 'Scaling group is deleted: test_group1.' in p.before.decode(), 'Test scaling group deletion unsuccessful'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'Scaling group deletion has failed'
 
 
 def test_list_scaling_group(run: ClientRunnerFunc):
