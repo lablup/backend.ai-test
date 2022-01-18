@@ -5,10 +5,10 @@ Automated test suites to validate an installation and integration of clients and
 
 ## How to run CLI-based integration test
 
-If there is no configuration script named `env-tester.sh`, copy it from `sample-env-tester.sh` and check the configuration env.
+If there is no configuration script named `env-tester-*.sh`, copy it from `sample-env-tester.sh` and check the configuration env.
 
 ```console
-$ source env-tester.sh
+$ source env-tester-admin.sh    # or source env-tester-user.sh
 $ backend.ai test run-cli
 ```
 
