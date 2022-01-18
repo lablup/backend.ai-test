@@ -19,7 +19,8 @@ def test_add_domain(run: ClientRunnerFunc):
     ]
     with closing(run(add_arguments)) as p:
         p.expect(EOF)
-        assert 'Domain name test is created.' in p.before.decode(), 'Domain creation not successful'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'Domain creation has failed'
 
     # Check if domain is added
     with closing(run(['--output=json', 'admin', 'domain', 'list'])) as p:
@@ -55,7 +56,8 @@ def test_update_domain(run: ClientRunnerFunc):
     ]
     with closing(run(add_arguments)) as p:
         p.expect(EOF)
-        assert 'Domain test is updated.' in p.before.decode(), 'Domain update not successful'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'Domain update has failed'
 
     # Check if domain is updated
     with closing(run(['--output=json', 'admin', 'domain', 'list'])) as p:
@@ -83,7 +85,8 @@ def test_delete_domain(run: ClientRunnerFunc):
     with closing(run(['admin', 'domain', 'purge', 'test123'])) as p:
         p.sendline('y')
         p.expect(EOF)
-        assert 'Domain is deleted:' in p.before.decode(), 'Domain deletion failed'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'Domain deletion has failed'
 
 
 def test_list_domain(run: ClientRunnerFunc):

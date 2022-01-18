@@ -33,7 +33,8 @@ def test_add_user(run: ClientRunnerFunc):
         ]
         with closing(run(add_arguments)) as p:
             p.expect(EOF)
-            assert 'User testaccount1@lablup.com is created' in p.before.decode(), 'Account add error'
+            json_result = json.loads(p.before.decode())
+            assert json_result.get('ok'), 'User creation has failed'
 
     if not bool(test_user2):
         # Add user
@@ -49,7 +50,8 @@ def test_add_user(run: ClientRunnerFunc):
         ]
         with closing(run(add_arguments)) as p:
             p.expect(EOF)
-            assert 'User testaccount2@lablup.com is created' in p.before.decode(), 'Account add error'
+            json_result = json.loads(p.before.decode())
+            assert json_result.get('ok'), 'User creation has failed'
 
     if not bool(test_user3):
         # Add user
@@ -65,7 +67,8 @@ def test_add_user(run: ClientRunnerFunc):
         ]
         with closing(run(add_arguments)) as p:
             p.expect(EOF)
-            assert 'User testaccount3@lablup.com is created' in p.before.decode(), 'Account add error'
+            json_result = json.loads(p.before.decode())
+            assert json_result.get('ok'), 'User creation has failed'
 
     # Check if user is added
     with closing(run(['--output=json', 'admin', 'user', 'list'])) as p:
@@ -174,17 +177,20 @@ def test_delete_user(run: ClientRunnerFunc):
     with closing(run(['admin', 'user', 'purge', 'testaccount1@lablup.com'])) as p:
         p.sendline('y')
         p.expect(EOF)
-        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#1'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'User deletion has failed'
 
     with closing(run(['admin', 'user', 'purge', 'testaccount2@lablup.com'])) as p:
         p.sendline('y')
         p.expect(EOF)
-        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#2'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'User deletion has failed'
 
     with closing(run(['admin', 'user', 'purge', 'testaccount3@lablup.com'])) as p:
         p.sendline('y')
         p.expect(EOF)
-        assert 'User is deleted:' in p.before.decode(), 'Account deletion failed: Account#3'
+        listed_result = p.before.decode().split()
+        assert listed_result.index('ok') == listed_result.index('True') - 1, 'User deletion has failed'
 
 
 def test_list_user(run: ClientRunnerFunc):
