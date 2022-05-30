@@ -5,10 +5,11 @@ import os
 from pathlib import Path
 import re
 import secrets
-from typing import Iterator, Sequence
+from typing import Callable, Iterator, Sequence, Tuple
 
 import pexpect
 import pytest
+from faker import Faker
 
 from ai.backend.test.utils.cli import ClientRunnerFunc, EOF, run as _run
 
@@ -70,3 +71,30 @@ def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
             p.expect_exact("Are you sure?")
             p.sendline("Y")
             p.expect(EOF)
+
+
+@pytest.fixture(scope="session")
+def users(n: int = 3) -> Tuple[str]:
+    fake = Faker()
+    return tuple(
+        {
+            'username': fake.user_name(),
+            'full_name': fake.name(),
+            'email': fake.email(),
+            'password': fake.password(8),
+            'role': ['user', 'admin', 'monitor'][i],
+            'status': ['active', 'inactive', 'before-verification', 'deleted'][i],
+            'need_password_change': [True, False, True][i],
+        }
+        for i in range(n)
+    )
+
+
+@pytest.fixture
+def gen_username() -> Callable[None, str]:
+    return lambda: Faker().user_name()
+
+
+@pytest.fixture
+def gen_fullname() -> Callable[None, str]:
+    return lambda: Faker().name()
