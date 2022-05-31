@@ -74,7 +74,7 @@ def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
 
 
 @pytest.fixture(scope="session")
-def users(n: int = 3) -> Tuple[str]:
+def users(n: int = 3) -> Tuple[dict]:
     fake = Faker()
     return tuple(
         {

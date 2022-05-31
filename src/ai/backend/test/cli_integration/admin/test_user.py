@@ -5,7 +5,7 @@ from typing import Callable, Tuple
 from ...utils.cli import EOF, ClientRunnerFunc
 
 
-def test_add_user(run: ClientRunnerFunc, users: Tuple[str]):
+def test_add_user(run: ClientRunnerFunc, users: Tuple[dict]):
     """
     Testcase for user addition.
     """
@@ -52,7 +52,7 @@ def test_add_user(run: ClientRunnerFunc, users: Tuple[str]):
 
 def test_update_user(
     run: ClientRunnerFunc,
-    users: Tuple[str],
+    users: Tuple[dict],
     gen_username: Callable[None, str],
     gen_fullname: Callable[None, str]
 ):
@@ -107,7 +107,7 @@ def test_update_user(
         assert user.get('domain_name') == updated_user['domain_name'], f'Domain mismatch: Account#{i+1}'
 
 
-def test_delete_user(run: ClientRunnerFunc, users: Tuple[str]):
+def test_delete_user(run: ClientRunnerFunc, users: Tuple[dict]):
     """
     !!Run this testcase after running test_add_user
     Testcase for user deletion.
