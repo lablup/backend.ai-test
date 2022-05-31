@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from contextlib import closing
 import os
-from pathlib import Path
 import re
 import secrets
+from collections import namedtuple
+from contextlib import closing
+from pathlib import Path
 from typing import Callable, Iterator, Sequence, Tuple
 
 import pexpect
@@ -73,7 +74,7 @@ def temp_domain(domain_name: str, run: ClientRunnerFunc) -> Iterator[str]:
             p.expect(EOF)
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def users(n: int = 3) -> Tuple[dict]:
     fake = Faker()
     return tuple(
@@ -82,12 +83,34 @@ def users(n: int = 3) -> Tuple[dict]:
             'full_name': fake.name(),
             'email': fake.email(),
             'password': fake.password(8),
-            'role': ['user', 'admin', 'monitor'][i],
-            'status': ['active', 'inactive', 'before-verification', 'deleted'][i],
-            'need_password_change': [True, False, True][i],
+            'role': ['user', 'admin', 'monitor'][i % 3],
+            'status': ['active', 'inactive', 'before-verification', 'deleted'][i % 4],
+            'need_password_change': [True, False, True][i % 3],
         }
         for i in range(n)
     )
+
+
+KeypairOption = namedtuple('KeypairOption',
+                           ('is_active', 'is_admin', 'rate_limit', 'resource_policy'))
+
+
+@pytest.fixture(scope="module")
+def keypair_options() -> Tuple[KeypairOption]:
+    return tuple([
+        KeypairOption(is_active=False, is_admin=True, rate_limit=25000, resource_policy='default'),
+        KeypairOption(is_active=True, is_admin=False, rate_limit=None, resource_policy='default'),
+        KeypairOption(is_active=True, is_admin=True, rate_limit=30000, resource_policy='default'),
+    ])
+
+
+@pytest.fixture(scope="module")
+def new_keypair_options() -> Tuple[KeypairOption]:
+    return tuple([
+        KeypairOption(is_active=True, is_admin=False, rate_limit=15000, resource_policy='default'),
+        KeypairOption(is_active=False, is_admin=True, rate_limit=15000, resource_policy='default'),
+        KeypairOption(is_active=False, is_admin=False, rate_limit=10000, resource_policy='default'),
+    ])
 
 
 @pytest.fixture
