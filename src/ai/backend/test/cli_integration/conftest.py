@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 import re
 import secrets
-from collections import namedtuple
 from contextlib import closing
 from pathlib import Path
 from typing import Callable, Iterator, Sequence, Tuple
@@ -89,28 +88,6 @@ def users(n: int = 3) -> Tuple[dict]:
         }
         for i in range(n)
     )
-
-
-KeypairOption = namedtuple('KeypairOption',
-                           ('is_active', 'is_admin', 'rate_limit', 'resource_policy'))
-
-
-@pytest.fixture(scope="module")
-def keypair_options() -> Tuple[KeypairOption]:
-    return tuple([
-        KeypairOption(is_active=False, is_admin=True, rate_limit=25000, resource_policy='default'),
-        KeypairOption(is_active=True, is_admin=False, rate_limit=None, resource_policy='default'),
-        KeypairOption(is_active=True, is_admin=True, rate_limit=30000, resource_policy='default'),
-    ])
-
-
-@pytest.fixture(scope="module")
-def new_keypair_options() -> Tuple[KeypairOption]:
-    return tuple([
-        KeypairOption(is_active=True, is_admin=False, rate_limit=15000, resource_policy='default'),
-        KeypairOption(is_active=False, is_admin=True, rate_limit=15000, resource_policy='default'),
-        KeypairOption(is_active=False, is_admin=False, rate_limit=10000, resource_policy='default'),
-    ])
 
 
 @pytest.fixture

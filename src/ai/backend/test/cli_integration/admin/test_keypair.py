@@ -1,12 +1,28 @@
 import json
+from collections import namedtuple
 from contextlib import closing
 from typing import Tuple
 
-from ..conftest import KeypairOption
 from ...utils.cli import EOF, ClientRunnerFunc
 
+KeypairOption = namedtuple('KeypairOption',
+                           ('is_active', 'is_admin', 'rate_limit', 'resource_policy'))
 
-def test_add_keypair(run: ClientRunnerFunc, users: Tuple[dict], keypair_options: Tuple[KeypairOption]):
+
+keypair_options = (
+    KeypairOption(is_active=False, is_admin=True, rate_limit=25000, resource_policy='default'),
+    KeypairOption(is_active=True, is_admin=False, rate_limit=None, resource_policy='default'),
+    KeypairOption(is_active=True, is_admin=True, rate_limit=30000, resource_policy='default'),
+)
+
+new_keypair_options = (
+    KeypairOption(is_active=True, is_admin=False, rate_limit=15000, resource_policy='default'),
+    KeypairOption(is_active=False, is_admin=True, rate_limit=15000, resource_policy='default'),
+    KeypairOption(is_active=False, is_admin=False, rate_limit=10000, resource_policy='default'),
+)
+
+
+def test_add_keypair(run: ClientRunnerFunc, users: Tuple[dict]):
     """
     Test add keypair.
     This test should be execued first in test_keypair.py.
@@ -65,7 +81,7 @@ def test_add_keypair(run: ClientRunnerFunc, users: Tuple[dict], keypair_options:
         assert keypair.get('resource_policy') == keypair_option.resource_policy, f'Keypair#{i+1} resource_policy mismatch'
 
 
-def test_update_keypair(run: ClientRunnerFunc, users: Tuple[dict], new_keypair_options: Tuple[KeypairOption]):
+def test_update_keypair(run: ClientRunnerFunc, users: Tuple[dict]):
     """
     Test update keypair.
     This test must be executed after test_add_keypair.
